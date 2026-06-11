@@ -74,19 +74,6 @@ http://localhost:3000
 
 ---
 
-## Deployment
-
-### Netlify
-
-1. Push the project to a GitHub repository
-2. Import the repository into Netlify
-3. Add environment variables in Netlify project settings
-4. Deploy
-
-After deployment, the application will be available at a Netlify subdomain.
-
----
-
 ## Notes
 
 - The model used is large and may have variable latency depending on API load.
