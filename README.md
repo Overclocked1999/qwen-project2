@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Qwen Chat App
 
-## Getting Started
+A real-time AI chat application powered by Qwen 3.5 (397B MoE) via the NVIDIA Inference API. Built with Next.js and designed to provide streaming, ChatGPT-like interactions.
 
-First, run the development server:
+---
 
-```bash
+## Features
+
+- Real-time streaming AI responses
+- Chat-style user interface
+- Server-side API route proxy (`/api/chat`)
+- Server-Sent Events (SSE) parsing for token streaming
+- Large-scale reasoning model support (Qwen 3.5 397B MoE)
+- Responsive frontend interface
+- Lightweight client-server architecture
+
+---
+
+## Tech Stack
+
+- Next.js (App Router)
+- React (Client Components)
+- NVIDIA Inference API
+- Qwen 3.5 397B MoE
+- Server-Sent Events (streaming)
+
+---
+
+## Architecture
+
+1. User sends a message from the frontend
+2. Request is sent to `/api/chat`
+3. Server forwards request to NVIDIA Inference API
+4. Response is streamed back as SSE chunks
+5. Frontend parses stream and updates UI in real time
+
+---
+
+## Project Structure
+
+app/
+  api/
+    chat/
+      route.js        API proxy to Qwen
+  page.tsx            Chat interface
+
+lib/
+  qwen.js             Optional API helper
+
+---
+
+## Environment Variables
+
+Create a `.env.local` file in the project root:
+
+QWEN_API_URL=https://integrate.api.nvidia.com/v1/chat/completions
+QWEN_API_KEY=your_api_key_here
+
+---
+
+## Running Locally
+
+Install dependencies:
+
+npm install
+
+Start development server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+### Netlify
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push the project to a GitHub repository
+2. Import the repository into Netlify
+3. Add environment variables in Netlify project settings
+4. Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+After deployment, the application will be available at a Netlify subdomain.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The model used is large and may have variable latency depending on API load.
+- Streaming is handled via SSE parsing in the frontend.
+- API keys must remain server-side and must not be exposed to the client.
+
+---
+
+## Future Improvements
+
+- Multi-chat support
+- User authentication system
+- Model routing (fast vs reasoning models)
+- Markdown and code highlighting support
+- Rate limiting and usage tracking
