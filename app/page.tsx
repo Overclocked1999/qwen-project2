@@ -13,6 +13,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
 
   const chatRef = useRef<HTMLDivElement>(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
     chatRef.current?.scrollTo({
@@ -20,6 +21,72 @@ export default function Page() {
       behavior: "smooth",
     });
   }, [messages]);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+    autoGreet();
+  }, []);
+
+  async function autoGreet() {
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content:
+                "Greet the user in one short sentence and ask how you can help.",
+            },
+          ],
+        }),
+      });
+
+      if (!res.body) throw new Error("No stream");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullText = "";
+      let started = false;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.replace("data: ", "").trim();
+          if (data === "[DONE]") continue;
+          try {
+            const json = JSON.parse(data);
+            const token = json?.choices?.[0]?.delta?.content;
+            if (token) {
+              fullText += token;
+              if (!started) {
+                started = true;
+                setMessages([{ role: "assistant", content: fullText }]);
+              } else {
+                setMessages([{ role: "assistant", content: fullText }]);
+              }
+            }
+          } catch {}
+        }
+      }
+    } catch (err: any) {
+      setMessages([
+        { role: "assistant", content: "Error connecting to AI: " + err.message },
+      ]);
+    }
+
+    setLoading(false);
+  }
 
   async function sendMessage() {
     if (!input.trim() || loading) return;
